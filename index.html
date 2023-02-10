@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+Bhaina+2&family=Roboto&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    nav {
+        background-color: rgb(37, 9, 37);
+        color: white;
+        height: 65px;
+        font-size: 27px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    nav ul {
+        list-style-type: none;
+    }
+
+    .gameContainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+    }
+
+    .container {
+        display: grid;
+        grid-template-rows: repeat(3, 10vw);
+        grid-template-columns: repeat(3, 10vw);
+        font-family: 'Roboto', sans-serif;
+        position: relative;
+    }
+
+    .box {
+        border: 2px solid black;
+        font-size: 8vw;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .box:hover {
+        background-color: rgb(242, 234, 250);
+    }
+
+    .info {
+        font-size: 22px;
+    }
+
+    .gameInfo {
+        padding: 0 34px;
+        font-family: 'Baloo Bhaina 2', cursive;
+    }
+
+    .gameInfo h1 {
+        font-size: 2.5rem;
+    }
+
+    .imgbox img {
+        width: 0;
+        transition: width 1s ease-in-out;
+    }
+
+    .br-0 {
+        border-right: 0;
+    }
+
+    .bl-0 {
+        border-left: 0;
+    }
+
+    .bt-0 {
+        border-top: 0;
+    }
+
+    .bb-0 {
+        border-bottom: 0;
+    }
+
+    #reset {
+        margin: 0 23px;
+        padding: 1px 18px;
+        background: #f3e7f9;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: 'Baloo Bhaina 2';
+        font-size: 15px;
+        font-weight: bolder;
+    }
+
+    .line {
+        background-color: black;
+        height: 3px;
+        width: 0;
+        position: absolute;
+        background-color: #911d91;
+        transition: width 1s ease-in-out;
+    }
+
+    @media screen and (max-width: 950px) {
+        .gameContainer {
+            flex-wrap: wrap;
+        }
+
+        .gameInfo {
+            margin-top: 34px;
+        }
+
+        .gameInfo h1 {
+            font-size: 1.5rem;
+        }
+
+        .container {
+            grid-template-rows: repeat(3, 20vw);
+            grid-template-columns: repeat(3, 20vw);
+        }
+
+        /* .line{
+    height: 5px;
+    width: 0;
+    transition: width 1s ease-in-out; */
+    }
+</style>
+
+<body>
+    <nav>
+        <ul>
+            <li>MyTicTacToe.com</li>
+        </ul>
+    </nav>
+    <div class="gameContainer">
+        <div class="container">
+            <div class="line" id="iline"></div>
+
+            <div class="box bt-0 bl-0"><span class="boxtext"></span></div>
+            <div class="box bt-0"><span class="boxtext"></span></div>
+            <div class="box bt-0 br-0"><span class="boxtext"></span></div>
+            <div class="box bl-0"><span class="boxtext"></span></div>
+            <div class="box"><span class="boxtext"></span></div>
+            <div class="box br-0"><span class="boxtext"></span></div>
+            <div class="box bl-0 bb-0"><span class="boxtext"></span></div>
+            <div class="box bb-0"><span class="boxtext"></span></div>
+            <div class="box bb-0 br-0"><span class="boxtext"></span></div>
+        </div>
+        <div class="gameInfo">
+            <h1>Welcome to Tic Tac MyTicTacToe</h1>
+            <div>
+                <span class="info" id="id_info">Turn for X</span>
+                <span class="info" id="result"></span>
+                <button id="reset">Reset</button>
+            </div>
+            <!-- <div class="imgbox">
+                <img src="excited.gif" alt="" />
+            </div> -->
+        </div>
+    </div>
+</body>
+<script>
+    // Variable initializer
+    let turn = 'X';
+    let bgMusic = new Audio('music.mp3');
+    let gameOver_music = new Audio('gameover.mp3');
+    let turn_music = new Audio('ting.mp3');
+    let box = document.getElementsByClassName("box")
+    let reset = document.getElementById("reset");
+    let info = document.getElementById("id_info");
+    let result = document.getElementById("result");
+    var max_width = window.matchMedia("(min-width: 600px)")
+    let gameOver = false;
+
+    // game functions
+    const checkText = (t) => { return box[t].innerText }
+
+    const changeTurn = () => { return turn === 'X' ? '0' : 'X'; }
+
+    const checkWin = () => {
+        // const wins = [
+        //     [0, 1, 2],
+        //     [3, 4, 5],
+        //     [6, 7, 8],
+        //     [0, 3, 6],
+        //     [1, 4, 7],
+        //     [2, 5, 8],
+        //     [0, 4, 8],
+        //     [2, 4, 6]
+        // ]
+        let wins = [
+            [0, 1, 2, 5, 5, 0, 10, 10],
+            [3, 4, 5, 5, 15, 0, 10, 30],
+            [6, 7, 8, 5, 25, 0, 10, 50],
+            [0, 3, 6, -5, 15, 90, -10, 30],
+            [1, 4, 7, 5, 15, 90, 10, 30],
+            [2, 5, 8, 15, 15, 90, 30, 30],
+            [0, 4, 8, 5, 15, 45, 10, 30],
+            [2, 4, 6, 5, 15, 135, 10, 30],
+        ]
+        wins.forEach(e => {
+            if ((checkText(e[0]) === checkText(e[1])) && (checkText(e[1]) === checkText(e[2])) && (checkText(e[2]) !== '')) {
+                result.innerText = `${checkText(e[0])} won`;
+                info.innerText = "";
+                gameOver = true;
+                bgMusic.pause();
+                gameOver_music.play();
+                function forPhone(max_width) {
+                    if (max_width.matches) { // If media query matches
+                        document.querySelector(".line").style.transform = `translate(${e[3]}vw, ${e[4]}vw) rotate(${e[5]}deg)`
+                        document.querySelector(".line").style.width = "20vw";
+                    } else {
+                        document.querySelector(".line").style.transform = `translate(${e[6]}vw, ${e[7]}vw) rotate(${e[5]}deg)`
+                        document.querySelector(".line").style.width = "40vw";
+                    }
+                }
+                forPhone(max_width) // Call listener function at run time
+                max_width.addListener(forPhone) // Attach listener function on state changes
+            }
+        })
+    }
+
+    // game-Events
+    const boxArr = Array.from(box);
+    boxArr.forEach(e => {
+        e.addEventListener('click', () => {
+            bgMusic.play();
+            let boxtext = e.querySelector(".boxtext");
+            if (boxtext.innerText === '') {
+                if (gameOver === false) {
+                    turn_music.play();
+                    boxtext.innerText = turn;
+                    turn = changeTurn();
+                    info.innerText = `Turn for ${turn}`;
+                    checkWin();
+                }
+            }
+        })
+    })
+
+    reset.addEventListener("click", () => {
+        let boxtext = document.getElementsByClassName("boxtext");
+        for (let i = 0; i < box.length; i++) {
+            boxtext[i].innerText = '';
+        }
+        gameOver = false;
+        bgMusic.pause();
+        document.querySelector(".line").style.width = "0";
+    })
+</script>
+
+</html>
